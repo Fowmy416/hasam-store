@@ -217,7 +217,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getDatabase, ref, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
@@ -260,9 +260,12 @@
             }
         }
 
-        // அதே பக்கத்தில் லாக்-இன் செய்ய Redirect முறை பயன்படுத்தப்பட்டுள்ளது
+        // Popup முறைக்கு மாற்றப்பட்டுள்ளது (இது எளிதாக லாகின் செய்து உள்ளே கொண்டு செல்லும்)
         loginBtn.addEventListener('click', () => {
-            signInWithRedirect(auth, provider);
+            signInWithPopup(auth, provider).catch((error) => {
+                console.error("Login Error: ", error);
+                alert("Login Error: " + error.message);
+            });
         });
 
         logoutBtn.addEventListener('click', () => signOut(auth));
@@ -275,11 +278,6 @@
             const data = localStorage.getItem(key);
             return data ? JSON.parse(data) : null;
         }
-
-        // லாகின் செய்துவிட்டு திரும்பி வரும்போது ரிசல்ட்டைப் பெற
-        getRedirectResult(auth).catch((error) => {
-            console.error(error);
-        });
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
