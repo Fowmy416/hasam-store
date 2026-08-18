@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HASAN STORE</title>
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #f0f2f5; padding: 10px; max-width: 500px; margin: auto; }
+        
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 5px 0;
+        }
+
+        .header { text-align: center; margin-bottom: 12px; }
+        .shop-title { 
+            font-size: 26px; 
+            font-weight: 800; 
+            background: linear-gradient(45deg, #1e3c72, #2a5298); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase; 
+            letter-spacing: 1.5px;
+        }
+        .sub-title { color: #65676b; font-size: 12px; margin-top: 2px; font-weight: 600; }
+
+        .user-auth-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-google-corner {
+            background: #ffffff;
+            color: #444;
+            border: 1px solid #ccc;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #fff;
+            padding: 4px 8px;
+            border-radius: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .user-avatar { width: 24px; height: 24px; border-radius: 50%; }
+        .user-name { font-size: 11px; font-weight: bold; color: #333; max-width: 80px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .btn-logout-icon { background: #dc3545; color: white; border: none; padding: 3px 6px; font-size: 10px; border-radius: 10px; cursor: pointer; }
+
+        /* லாக்-இன் செய்யாத போது முழு பக்கத்தையும் லாக் செய்ய */
+        .disabled-app {
+            opacity: 0.35 !important;
+            pointer-events: none !important;
+            user-select: none !important;
+            filter: grayscale(80%);
+        }
+
+        .tab-container {
+            display: flex;
+            background: #e4e6eb;
+            border-radius: 10px;
+            padding: 3px;
+            margin-bottom: 15px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 8px;
+            text-align: center;
+            border: none;
+            background: transparent;
+            font-weight: bold;
+            font-size: 13px;
+            color: #4b4f56;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+        .tab-btn.active {
+            background: white;
+            color: #007bff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        .summary-container { display: flex; gap: 8px; margin-bottom: 15px; }
+        .summary-card { flex: 1; padding: 10px 5px; border-radius: 10px; text-align: center; color: white; }
+        .card-sales { background: linear-gradient(135deg, #28a745, #1e7e34); }
+        .card-expenses { background: linear-gradient(135deg, #dc3545, #a71d2a); }
+        .card-net { background: linear-gradient(135deg, #007bff, #0056b3); }
+        .summary-card div { font-size: 10px; font-weight: 600; text-transform: uppercase; }
+        .summary-card span { font-size: 14px; font-weight: bold; display: block; margin-top: 4px; }
+        
+        .card { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); margin-bottom: 15px; border-top: 4px solid #007bff; }
+        label { font-weight: 700; color: #4b4f56; display: block; margin-top: 10px; font-size: 13px; }
+        input { width: 100%; padding: 10px; margin-top: 4px; border-radius: 6px; font-size: 14px; border: 1.5px solid #ccc; }
+        
+        .btn-save { width: 100%; margin-top: 15px; padding: 10px; background: linear-gradient(45deg, #007bff, #0056b3); color: white; border: none; font-size: 15px; font-weight: bold; border-radius: 6px; cursor: pointer; }
+        
+        .section-title { font-size: 15px; color: #1c1e21; margin-bottom: 8px; font-weight: 700; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; }
+        th { background: #343a40; color: white; padding: 8px 4px; font-size: 11px; }
+        td { border-bottom: 1px solid #f0f2f5; padding: 8px 4px; text-align: center; font-size: 12px; }
+        
+        .text-sales { color: #28a745; font-weight: bold; }
+        .text-expense { color: #dc3545; font-weight: bold; }
+        .profit { color: #28a745; font-weight: bold; background: #e8f5e9; padding: 2px 5px; border-radius: 4px; }
+        .loss { color: #dc3545; font-weight: bold; background: #ffebee; padding: 2px 5px; border-radius: 4px; }
+        .btn-delete { background: #ff4d4f; color: white; border: none; padding: 4px 8px; font-size: 10px; border-radius: 4px; cursor: pointer; }
+        .qty-btn { width: 26px; height: 26px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .btn-plus { background: #28a745; color: white; }
+        .btn-minus { background: #ffc107; color: black; }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <div style="font-size: 11px; font-weight: bold;" id="statusText">உள்நுழையவும் ➔</div>
+        
+        <div class="user-auth-box">
+            <button class="btn-google-corner" id="loginBtn">
+                <svg width="14" height="14" viewBox="0 0 18 18">
+                    <path fill="#4285F4" d="M17.64 9.2c0-.74-.06-1.28-.19-1.84H9v3.34h4.96c-.1.83-.64 2.08-1.84 2.92l2.84 2.2c1.7-1.57 2.68-3.88 2.68-6.62z"/>
+                    <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.84-2.2c-.76.53-1.78.9-3.12.9-2.38 0-4.41-1.57-5.13-3.72L.97 13.01C2.45 15.97 5.48 18 9 18z"/>
+                    <path fill="#FBBC05" d="M3.87 10.8c-.18-.53-.28-1.1-.28-1.8s.1-1.27.28-1.8L.97 4.99C.35 6.22 0 7.57 0 9s.35 2.78.97 4.01l2.9-2.21z"/>
+                    <path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0 5.48 0 2.45 2.03.97 4.99l2.9 2.21C4.59 5.05 6.62 3.58 9 3.58z"/>
+                </svg>
+                Login
+            </button>
+
+            <div class="user-profile" id="userProfile" style="display: none;">
+                <img src="" id="userImg" class="user-avatar" alt="User">
+                <span id="userName" class="user-name">User</span>
+                <button class="btn-logout-icon" id="logoutBtn">X</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="header">
+        <div class="shop-title">HASAN STORE</div>
+        <div class="sub-title">நடமாடும் கடை - கணக்கு & ஸ்டாக் நிர்வாகம்</div>
+    </div>
+
+    <!-- லாக்-இன் செய்யும் வரை இந்த பிரிவு Disable ஆக இருக்கும் -->
+    <div id="mainApp" class="disabled-app">
+        <div class="tab-container">
+            <button class="tab-btn active" onclick="switchTab('accounts')">📊 வரவு செலவு</button>
+            <button class="tab-btn" onclick="switchTab('stock')">📦 My Stock</button>
+        </div>
+
+        <div id="accountsTab" class="tab-content active">
+            <div class="summary-container">
+                <div class="summary-card card-sales"><div>விற்பனை</div><span id="topSales">Rs. 0</span></div>
+                <div class="summary-card card-expenses"><div>செலவு</div><span id="topExpenses">Rs. 0</span></div>
+                <div class="summary-card card-net"><div>மீதி</div><span id="topNet">Rs. 0</span></div>
+            </div>
+
+            <div class="card">
+                <label>தேதி:</label>
+                <input type="date" id="entryDate" disabled>
+
+                <label style="color: #28a745;">இன்றைய விற்பனை (Rs.):</label>
+                <input type="number" id="totalSales" placeholder="0" disabled>
+
+                <label style="color: #dc3545;">இன்றைய செலவு (Rs.):</label>
+                <input type="number" id="totalExpenses" placeholder="0" disabled>
+
+                <label style="font-size: 12px; font-weight: normal;">செலவு விபரம் (Optional):</label>
+                <input type="text" id="expenseNote" placeholder="எ.கா: டீ, பொட்டலம்" disabled>
+
+                <button class="btn-save" id="btnSaveEntry" disabled>பதிவு செய்</button>
+            </div>
+
+            <div class="section-title">நாட்குறிப்பு விபரம்</div>
+            <table>
+                <thead>
+                    <tr><th>தேதி</th><th>விற்பனை</th><th>செலவு</th><th>மீதி</th><th>நீக்கு</th></tr>
+                </thead>
+                <tbody id="logTable"></tbody>
+            </table>
+        </div>
+
+        <div id="stockTab" class="tab-content">
+            <div class="card" style="border-top-color: #28a745;">
+                <label style="color: #28a745;">பொருளின் பெயர்:</label>
+                <input type="text" id="itemName" placeholder="எ.கா: Apple" disabled>
+
+                <label style="color: #28a745;">தொடக்க அளவு:</label>
+                <input type="number" id="itemQty" placeholder="0" disabled>
+
+                <button class="btn-save" style="background: linear-gradient(45deg, #28a745, #1e7e34);" id="btnAddStock" disabled>பொருளைச் சேர்</button>
+            </div>
+
+            <div class="section-title">இருப்புப் பட்டியல்</div>
+            <table>
+                <thead>
+                    <tr><th>பொருள்</th><th>அளவு</th><th>கூட்டு / குறை</th><th>நீக்கு</th></tr>
+                </thead>
+                <tbody id="stockTable"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getDatabase, ref, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA1O6aYJru6BxinCcg8BrCiS5Q_39tAo3A",
+  authDomain: "hasan-store-fbc63.firebaseapp.com",
+  projectId: "hasan-store-fbc63",
+  storageBucket: "hasan-store-fbc63.firebasestorage.app",
+  messagingSenderId: "795506687367",
+  appId: "1:795506687367:web:aa381fe9ae2381a66a6722"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+        const provider = new GoogleAuthProvider();
+
+        let currentUser = null;
+
+        const loginBtn = document.getElementById('loginBtn');
+        const userProfile = document.getElementById('userProfile');
+        const userImg = document.getElementById('userImg');
+        const userName = document.getElementById('userName');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const mainApp = document.getElementById('mainApp');
+        const statusText = document.getElementById('statusText');
+
+        document.getElementById('entryDate').valueAsDate = new Date();
+
+        // இன்டர்நெட் உள்ளதா / இல்லையா என கண்டறியும் வசதி
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+
+        function updateOnlineStatus() {
+            if (!currentUser) return;
+            if (navigator.onLine) {
+                statusText.innerText = "🟢 ஆன்லைன்";
+                statusText.style.color = "#28a745";
+            } else {
+                statusText.innerText = "🔴 ஆஃப்லைன் (Offline Storage)";
+                statusText.style.color = "#dc3545";
+            }
+        }
+
+        loginBtn.addEventListener('click', () => signInWithPopup(auth, provider));
+        logoutBtn.addEventListener('click', () => signOut(auth));
+
+        // ஆஃப்லைனில் உள்ளூர் தகவல்களை (Local Storage) சேமிக்கும் வசதி
+        function saveLocal(key, data) {
+            localStorage.setItem(key, JSON.stringify(data));
+        }
+
+        function getLocal(key) {
+            const data = localStorage.getItem(key);
+            return data ? JSON.parse(data) : null;
+        }
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                loginBtn.style.display = 'none';
+                userProfile.style.display = 'flex';
+                userName.innerText = user.displayName ? user.displayName.split(' ')[0] : 'User';
+                userImg.src = user.photoURL || 'https://via.placeholder.com/24';
+                
+                // Form Inputs-ஐ Enable செய்ய
+                mainApp.classList.remove('disabled-app');
+                document.querySelectorAll('input, button').forEach(el => el.removeAttribute('disabled'));
+
+                updateOnlineStatus();
+                loadData();
+            } else {
+                currentUser = null;
+                loginBtn.style.display = 'flex';
+                userProfile.style.display = 'none';
+                statusText.innerText = 'உள்நுழையவும் ➔';
+                statusText.style.color = '#777';
+                
+                // Form Inputs-ஐ Disable செய்ய
+                mainApp.classList.add('disabled-app');
+                document.querySelectorAll('input, button').forEach(el => {
+                    if(el.id !== 'loginBtn') el.setAttribute('disabled', 'true');
+                });
+
+                document.getElementById('logTable').innerHTML = '';
+                document.getElementById('stockTable').innerHTML = '';
+            }
+        });
+
+        window.switchTab = function(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            if (tabName === 'accounts') {
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                document.getElementById('accountsTab').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.getElementById('stockTab').classList.add('active');
+            }
+        };
+
+        function renderLogs(data) {
+            const tbody = document.getElementById('logTable');
+            tbody.innerHTML = '';
+            let salesSum = 0, expensesSum = 0;
+
+            if (data) {
+                Object.keys(data).reverse().forEach(key => {
+                    const item = data[key];
+                    const sales = parseFloat(item.sales) || 0;
+                    const expenses = parseFloat(item.expenses) || 0;
+                    const net = sales - expenses;
+                    salesSum += sales;
+                    expensesSum += expenses;
+
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${item.date}</td>
+                            <td class="text-sales">Rs. ${sales}</td>
+                            <td class="text-expense">Rs. ${expenses}</td>
+                            <td><span class="${net >= 0 ? 'profit' : 'loss'}">Rs. ${net}</span></td>
+                            <td><button class="btn-delete" onclick="deleteEntry('${key}')">நீக்கு</button></td>
+                        </tr>
+                    `;
+                });
+            }
+            document.getElementById('topSales').innerText = `Rs. ${salesSum}`;
+            document.getElementById('topExpenses').innerText = `Rs. ${expensesSum}`;
+            document.getElementById('topNet').innerText = `Rs. ${salesSum - expensesSum}`;
+        }
+
+        function renderStock(data) {
+            const tbody = document.getElementById('stockTable');
+            tbody.innerHTML = '';
+
+            if (data) {
+                Object.keys(data).forEach(key => {
+                    const item = data[key];
+                    const qty = parseInt(item.qty) || 0;
+
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${item.name}</td>
+                            <td><b>${qty}</b></td>
+                            <td>
+                                <button class="qty-btn btn-plus" onclick="updateQty('${key}', ${qty + 1})">+</button>
+                                <button class="qty-btn btn-minus" onclick="updateQty('${key}', ${qty - 1})">-</button>
+                            </td>
+                            <td><button class="btn-delete" onclick="deleteStockItem('${key}')">நீக்கு</button></td>
+                        </tr>
+                    `;
+                });
+            }
+        }
+
+        function loadData() {
+            if (!currentUser) return;
+
+            // ஆஃப்லைனில் இருந்தால் Local Data காட்டும்
+            const localLogs = getLocal(`logs_${currentUser.uid}`);
+            if (localLogs) renderLogs(localLogs);
+
+            const localStock = getLocal(`stock_${currentUser.uid}`);
+            if (localStock) renderStock(localStock);
+
+            // ஆன்லைனில் Firebase-ல் இருந்து டேட்டாவை Sync செய்யும்
+            onValue(ref(db, `users/${currentUser.uid}/logs`), (snapshot) => {
+                const data = snapshot.val();
+                saveLocal(`logs_${currentUser.uid}`, data);
+                renderLogs(data);
+            });
+
+            onValue(ref(db, `users/${currentUser.uid}/stock`), (snapshot) => {
+                const data = snapshot.val();
+                saveLocal(`stock_${currentUser.uid}`, data);
+                renderStock(data);
+            });
+        }
+
+        document.getElementById('btnSaveEntry').addEventListener('click', () => {
+            const date = document.getElementById('entryDate').value;
+            const sales = parseFloat(document.getElementById('totalSales').value) || 0;
+            const expenses = parseFloat(document.getElementById('totalExpenses').value) || 0;
+            const note = document.getElementById('expenseNote').value.trim();
+
+            if (!date || (!sales && !expenses)) return alert("விபரங்களைச் சரியாக உள்ளிடவும்!");
+
+            push(ref(db, `users/${currentUser.uid}/logs`), { date, sales, expenses, note });
+            document.getElementById('totalSales').value = '';
+            document.getElementById('totalExpenses').value = '';
+            document.getElementById('expenseNote').value = '';
+        });
+
+        window.deleteEntry = (key) => confirm("நீக்க வேண்டுமா?") && remove(ref(db, `users/${currentUser.uid}/logs/${key}`));
+
+        document.getElementById('btnAddStock').addEventListener('click', () => {
+            const name = document.getElementById('itemName').value.trim();
+            const qty = parseInt(document.getElementById('itemQty').value) || 0;
+            if (!name) return alert("பெயரை உள்ளிடவும்!");
+
+            push(ref(db, `users/${currentUser.uid}/stock`), { name, qty });
+            document.getElementById('itemName').value = '';
+            document.getElementById('itemQty').value = '';
+        });
+
+        window.updateQty = (key, qty) => update(ref(db, `users/${currentUser.uid}/stock/${key}`), { qty: Math.max(0, qty) });
+        window.deleteStockItem = (key) => confirm("நீக்க வேண்டுமா?") && remove(ref(db, `users/${currentUser.uid}/stock/${key}`));
+    </script>
+</body>
+</html>
