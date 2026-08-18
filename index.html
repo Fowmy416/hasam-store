@@ -218,16 +218,16 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getDatabase, ref, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyA1O6aYJru6BxinCcg8BrCiS5Q_39tAo3A",
-  authDomain: "hasan-store-fbc63.firebaseapp.com",
-  projectId: "hasan-store-fbc63",
-  storageBucket: "hasan-store-fbc63.firebasestorage.app",
-  messagingSenderId: "795506687367",
-  appId: "1:795506687367:web:aa381fe9ae2381a66a6722"
+            authDomain: "hasan-store-fbc63.firebaseapp.com",
+            projectId: "hasan-store-fbc63",
+            storageBucket: "hasan-store-fbc63.firebasestorage.app",
+            messagingSenderId: "795506687367",
+            appId: "1:795506687367:web:aa381fe9ae2381a66a6722"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -247,7 +247,6 @@
 
         document.getElementById('entryDate').valueAsDate = new Date();
 
-        // இன்டர்நெட் உள்ளதா / இல்லையா என கண்டறியும் வசதி
         window.addEventListener('online', updateOnlineStatus);
         window.addEventListener('offline', updateOnlineStatus);
 
@@ -262,10 +261,13 @@
             }
         }
 
-        loginBtn.addEventListener('click', () => signInWithPopup(auth, provider));
+        // அதே பக்கத்தில் லாக்-இன் செய்ய Redirect முறை பயன்படுத்தப்பட்டுள்ளது
+        loginBtn.addEventListener('click', () => {
+            signInWithRedirect(auth, provider);
+        });
+
         logoutBtn.addEventListener('click', () => signOut(auth));
 
-        // ஆஃப்லைனில் உள்ளூர் தகவல்களை (Local Storage) சேமிக்கும் வசதி
         function saveLocal(key, data) {
             localStorage.setItem(key, JSON.stringify(data));
         }
@@ -275,6 +277,11 @@
             return data ? JSON.parse(data) : null;
         }
 
+        // லாகின் செய்துவிட்டு திரும்பி வரும்போது ரிசல்ட்டைப் பெற
+        getRedirectResult(auth).catch((error) => {
+            console.error(error);
+        });
+
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
@@ -283,7 +290,6 @@
                 userName.innerText = user.displayName ? user.displayName.split(' ')[0] : 'User';
                 userImg.src = user.photoURL || 'https://via.placeholder.com/24';
                 
-                // Form Inputs-ஐ Enable செய்ய
                 mainApp.classList.remove('disabled-app');
                 document.querySelectorAll('input, button').forEach(el => el.removeAttribute('disabled'));
 
@@ -296,7 +302,6 @@
                 statusText.innerText = 'உள்நுழையவும் ➔';
                 statusText.style.color = '#777';
                 
-                // Form Inputs-ஐ Disable செய்ய
                 mainApp.classList.add('disabled-app');
                 document.querySelectorAll('input, button').forEach(el => {
                     if(el.id !== 'loginBtn') el.setAttribute('disabled', 'true');
@@ -377,14 +382,12 @@
         function loadData() {
             if (!currentUser) return;
 
-            // ஆஃப்லைனில் இருந்தால் Local Data காட்டும்
             const localLogs = getLocal(`logs_${currentUser.uid}`);
             if (localLogs) renderLogs(localLogs);
 
             const localStock = getLocal(`stock_${currentUser.uid}`);
             if (localStock) renderStock(localStock);
 
-            // ஆன்லைனில் Firebase-ல் இருந்து டேட்டாவை Sync செய்யும்
             onValue(ref(db, `users/${currentUser.uid}/logs`), (snapshot) => {
                 const data = snapshot.val();
                 saveLocal(`logs_${currentUser.uid}`, data);
